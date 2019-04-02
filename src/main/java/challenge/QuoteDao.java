@@ -1,28 +1,40 @@
 package challenge;
 
-import java.sql.ResultSet;
-import java.sql.SQLException;
-import java.sql.Statement;
+import java.sql.*;
 
 public class QuoteDao {
 
-	public Quote getQuote() throws SQLException {
-		Statement statement = ConnectionFactory.createConnection().createStatement();
-		ResultSet resultSet = statement.executeQuery("SELECT * FROM 'scripts' WHERE actor is not null ORDER BY random() LIMIT 1");
+	private Quote executeQueryToGetOne(PreparedStatement preparedStatement) throws  SQLException {
 		Quote quote = null;
-		while (resultSet.next()) {
-			quote = new Quote();
-			quote.setActor(resultSet.getString("actor"));
-			quote.setQuote(resultSet.getString("detail"));
-			System.out.println(resultSet.getString("detail"));
-			System.out.println(resultSet.getString("actor"));
-			System.out.println(resultSet.getInt("index"));
+		try (ResultSet resultSet = preparedStatement.executeQuery()) {
+			if (resultSet.next()) {
+				quote = new Quote();
+				quote.setActor(resultSet.getString("actor"));
+				quote.setQuote(resultSet.getString("detail"));
+			}
+		}
+		return quote;
+	}
+
+	public Quote getQuote() throws SQLException {
+		Quote quote = null;
+		String sql = "SELECT * FROM scripts WHERE actor is not null ORDER BY random() LIMIT 1";
+		try (Connection conn = ConnectionFactory.createConnection();
+			 PreparedStatement preparedStatement = conn.prepareStatement(sql)) {
+			quote = this.executeQueryToGetOne(preparedStatement);
 		}
 		return quote;
 	}
 
 	public Quote getQuoteByActor(String actor) throws SQLException {
-		return null;
+		Quote quote = null;
+		String sql = "SELECT * FROM scripts WHERE actor = ? ORDER BY random() LIMIT 1";
+		try (Connection conn = ConnectionFactory.createConnection();
+			 PreparedStatement preparedStatement = conn.prepareStatement(sql)) {
+			preparedStatement.setString(1, actor);
+			quote = this.executeQueryToGetOne(preparedStatement);
+		}
+		return quote;
 	}
 
 }

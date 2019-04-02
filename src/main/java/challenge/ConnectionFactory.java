@@ -13,7 +13,7 @@ public class ConnectionFactory {
 			e.printStackTrace();
 			return null;
 		}
-		return DriverManager.getConnection("jdbc:sqlite:database.sqlite");
+		return DriverManager.getConnection("jdbc:sqlite::resource:database.sqlite");
 	}
 
 }
