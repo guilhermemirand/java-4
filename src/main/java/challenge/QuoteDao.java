@@ -8,21 +8,17 @@ public class QuoteDao {
 
 	public Quote getQuote() throws SQLException {
 		Statement statement = ConnectionFactory.createConnection().createStatement();
-		ResultSet resultSet = statement.executeQuery("select * from scripts");
-		this.writeMetaData(resultSet);
-		return null;
-	}
-
-	private void writeMetaData(ResultSet resultSet) throws SQLException {
-		//  Now get some metadata from the database
-		// Result set get the result of the SQL query
-
-		System.out.println("The columns in the table are: ");
-
-		System.out.println("Table: " + resultSet.getMetaData().getTableName(1));
-		for  (int i = 1; i<= resultSet.getMetaData().getColumnCount(); i++){
-			System.out.println("Column " +i  + " "+ resultSet.getMetaData().getColumnName(i));
+		ResultSet resultSet = statement.executeQuery("SELECT * FROM 'scripts' WHERE actor is not null ORDER BY random() LIMIT 1");
+		Quote quote = null;
+		while (resultSet.next()) {
+			quote = new Quote();
+			quote.setActor(resultSet.getString("actor"));
+			quote.setQuote(resultSet.getString("detail"));
+			System.out.println(resultSet.getString("detail"));
+			System.out.println(resultSet.getString("actor"));
+			System.out.println(resultSet.getInt("index"));
 		}
+		return quote;
 	}
 
 	public Quote getQuoteByActor(String actor) throws SQLException {
